@@ -65,7 +65,7 @@ window = tk.Tk()
 window.title("Chess.com Game Downloader")
 frame_a = tk.Frame(padx=20, pady=10)
 
-name = tk.Label(master=frame_a, text="Account Name")
+name = tk.Label(master=frame_a, text="Account Name", padx=10)
 name_entry = tk.Entry(master=frame_a)
 
 name.pack(side=tk.LEFT)
@@ -73,7 +73,7 @@ name_entry.pack(side=tk.LEFT)
 
 frame_b = tk.Frame(padx=20, pady=10)
 
-opp = tk.Label(master=frame_b, text="Opponent's Name")
+opp = tk.Label(master=frame_b, text="Opponent's Name", padx=10)
 opp_entry = tk.Entry(master=frame_b)
 
 opp.pack(side=tk.LEFT)
@@ -82,7 +82,7 @@ opp_entry.pack(side=tk.LEFT)
 
 frame_c = tk.Frame(padx=20, pady=10)
 
-location = tk.Label(master=frame_c, text="File Destination")
+location = tk.Label(master=frame_c, text="File Destination", padx=10)
 loc_entry = tk.Entry(master=frame_c)
 
 location.pack(side=tk.LEFT)
