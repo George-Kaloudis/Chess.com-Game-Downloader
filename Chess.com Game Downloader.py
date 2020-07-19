@@ -5,7 +5,13 @@ import requests
 
 def main():
     user = input("Player's Name:")
-    where = os.path.join(input("Directory(Empty for current):"), "%s's Archive %s" % (user, date.today()))
+    opp_entry = input("Opponent's Name(Optional):")
+    
+    
+    if(opp_entry == ""):
+        where = os.path.join(input("Directory(Empty for current):"), "%s's Archive %s" % (user, date.today()))
+    else:
+        where = os.path.join(input("Directory(Empty for current):"), "%s's vs %s Archive %s" % (user, opp_entry, date.today()))
     
     if not os.path.exists(where + ".pgn"):
         where += ".pgn"
@@ -20,19 +26,27 @@ def main():
         
     print("Downloading %s's games to %s:" % (user, where))
     for archive in get('https://api.chess.com/pub/player/%s/games/archives' % user)['archives']:
-        aa(archive, where)
+        aa(archive, where, opp_entry)
     
 
-def aa(url, where):
+def aa(url, where, opp):
     games = get(url)['games']
     with open(where, 'a+', encoding='utf-8') as output:
         for game in games:
             if (game['rules'] == 'chess'):
-                try:
-                    print(game['pgn'], file=output)
-                    print('', file=output)
-                except:
-                    pass
+                if (opp == ""):
+                    try:
+                        print(game['pgn'], file=output)
+                        print('', file=output)
+                    except:
+                        pass
+                else:
+                    if (game['white']['username'] == opp or game['black']['username'] == opp):
+                        try:
+                            print(game['pgn'], file=output)
+                            print('', file=output)
+                        except:
+                            pass
 
 def get(url):
     return requests.get(url).json()
