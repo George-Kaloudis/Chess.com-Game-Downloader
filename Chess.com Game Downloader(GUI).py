@@ -30,13 +30,14 @@ def aa(url, where):
     with open(where, 'a+', encoding='utf-8') as output:
         for game in games:
             try:
-                if (event.get() == "All Games"):
-                    print(game['pgn'], file=output)
-                    print('', file=output)
-                else:
-                    if(dictn[event.get()] == game['time_class']):
+                if (game['rules'] == 'chess'):
+                    if (event.get() == "All Games"):
                         print(game['pgn'], file=output)
                         print('', file=output)
+                    else:
+                        if(dictn[event.get()] == game['time_class']):
+                            print(game['pgn'], file=output)
+                            print('', file=output)
                     
             except:
                 pass

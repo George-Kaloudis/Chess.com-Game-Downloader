@@ -27,11 +27,12 @@ def aa(url, where):
     games = get(url)['games']
     with open(where, 'a+', encoding='utf-8') as output:
         for game in games:
-            try:
-                print(game['pgn'], file=output)
-                print('', file=output)
-            except:
-                pass
+            if (game['rules'] == 'chess'):
+                try:
+                    print(game['pgn'], file=output)
+                    print('', file=output)
+                except:
+                    pass
 
 def get(url):
     return requests.get(url).json()
