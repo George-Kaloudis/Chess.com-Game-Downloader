@@ -5,9 +5,10 @@ from datetime import date
 import os.path
 import requests
 import os
-import sys
+import sys, time
 
 dictn = {'All Games': 'All Games', 'Bullet': 'bullet', 'Blitz': 'blitz', 'Rapid': 'rapid', 'Daily Chess': 'daily'}
+dictb = {'Small, Only Wins': 0, 'Small, All Games': 1, 'Large, Only Wins': 2,'Large, All Games': 3}
 
 def resource_path(relative_path):
     """ Get the absolute path to the resource, works for dev and for PyInstaller """
@@ -77,17 +78,28 @@ def mob():
         obw(archive, obwp)
         obb(archive, obbp)
     try:
+        
         os.chdir(updir)
+        
+        
         os.system("pgn-extract -s -C -N -V -tstartpos.txt -owclean.pgn %s" % (obwp))
-        os.system("polyglot make-book -only-white -pgn wclean.pgn -bin w1.bin -max-ply 32 -min-game 25")
-        os.system("polyglot make-book -only-white -pgn wclean.pgn -bin w2.bin -max-ply 60 -min-game 5")
-        os.system("polyglot merge-book -in1 w1.bin -in2 w2.bin -out w12.bin")
-
         os.system("pgn-extract -s -C -N -V -tstartpos.txt -obclean.pgn %s" % (obbp))
-        os.system("polyglot make-book -only-black -pgn bclean.pgn -bin b1.bin -max-ply 32 -min-game 25")
-        os.system("polyglot make-book -only-black -pgn bclean.pgn -bin b2.bin -max-ply 60 -min-game 5")
-        os.system("polyglot merge-book -in1 b1.bin -in2 b2.bin -out b12.bin")
 
+        if (dictb[bo.get()] == 0 or dictb[bo.get()] == 1):
+            os.system("polyglot make-book -only-white -pgn wclean.pgn -bin w1.bin -max-ply 32 -min-game 25")
+            os.system("polyglot make-book -only-white -pgn wclean.pgn -bin w2.bin -max-ply 60 -min-game 5")
+            os.system("polyglot make-book -only-black -pgn bclean.pgn -bin b1.bin -max-ply 32 -min-game 25")
+            os.system("polyglot make-book -only-black -pgn bclean.pgn -bin b2.bin -max-ply 60 -min-game 5")
+        else:
+            os.system("polyglot make-book -only-white -pgn wclean.pgn -bin w1.bin")
+            os.system("polyglot make-book -only-white -pgn wclean.pgn -bin w2.bin")
+            os.system("polyglot make-book -only-black -pgn bclean.pgn -bin b1.bin")
+            os.system("polyglot make-book -only-black -pgn bclean.pgn -bin b2.bin")
+            
+            
+        os.system("polyglot merge-book -in1 w1.bin -in2 w2.bin -out w12.bin")
+        os.system("polyglot merge-book -in1 b1.bin -in2 b2.bin -out b12.bin")
+        
         os.system("polyglot merge-book -in1 w12.bin -in2 b12.bin -out %s.bin" % (finalfile))
 
         os.remove(obwp)
@@ -140,9 +152,14 @@ def obw(url, where):
         for game in games:
             try:
                 if (game['rules'] == 'chess'):
-                    if (game['white']['username'] == user and game['white']['result'] == 'win'):
-                        print(game['pgn'], file=output)
-                        print('', file=output)
+                    if (game['white']['username'] == user):
+                        if (dictb[bo.get()] == 0 or dictb[bo.get()] == 2):
+                            if (game['white']['result'] == 'win'):
+                                print(game['pgn'], file=output)
+                                print('', file=output)
+                        else:
+                            print(game['pgn'], file=output)
+                            print('', file=output)
             except:
                 pass
 def obb(url, where):
@@ -152,9 +169,14 @@ def obb(url, where):
         for game in games:
             try:
                 if (game['rules'] == 'chess'):
-                    if (game['black']['username'] == user and game['black']['result'] == 'win'):
-                        print(game['pgn'], file=output)
-                        print('', file=output)
+                    if (game['black']['username'] == user):
+                        if (dictb[bo.get()] == 0 or dictb[bo.get()] == 2):
+                            if (game['black']['result'] == 'win'):
+                                print(game['pgn'], file=output)
+                                print('', file=output)
+                        else:
+                            print(game['pgn'], file=output)
+                            print('', file=output)
             except:
                 pass
 
@@ -194,10 +216,21 @@ loc_entry.pack(side=tk.LEFT)
 
 frame_d = tk.Frame(padx=20, pady=10)
 
+tr = tk.Label(master=frame_d, text="Time Rules :", padx=10)
 event = ttk.Combobox(master=frame_d, state="readonly", values = ['All Games', 'Bullet', 'Blitz', 'Rapid', 'Daily Chess'])
 event.current(0)
+
+tr.pack(side=tk.LEFT)
 event.pack(side=tk.LEFT)
 
+frame_e = tk.Frame(padx=20, pady=10)
+
+bot = tk.Label(master=frame_e, text="Book Options :", padx=10)
+bo = ttk.Combobox(master=frame_e, state="readonly", values = ['Small, Only Wins', 'Small, All Games', 'Large, Only Wins','Large, All Games'])
+bo.current(0)
+
+bot.pack(side=tk.LEFT)
+bo.pack(side=tk.LEFT)
 
 frame_ob = tk.Frame(padx=20, pady=10)
 ob = tk.Button(master=frame_ob, text="Make Opening Book", command=mob)
@@ -214,6 +247,7 @@ frame_a.pack()
 frame_b.pack()
 frame_c.pack()
 frame_d.pack()
+frame_e.pack()
 frame_ob.pack()
 frame_end.pack()
 
